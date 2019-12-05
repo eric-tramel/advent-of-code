@@ -1,5 +1,6 @@
 import os
 import sys
+import itertools
 
 from pathlib import Path
 from functools import reduce
@@ -112,7 +113,31 @@ if __name__ == "__main__":
         wire_descriptions[i] = [decode_wire_str(t) for t in wire_descriptions[i].split(",")]
         wire_descriptions[i] = tokens_to_lines(wire_descriptions[i])
 
-    print(wire_descriptions)
+    # Can we now get the list of intersections in a crazy fashion?
+    # We need to loop over wires, check them against each other wire.
+    # So we need to,really, make a big list of the line segments for the 
+    # entire problem (we now have a big stack of line segments) and 
+    # check the product of all of these with eachother, but not checking
+    # one against itself again.
+    intersections = []
+    all_line_segments = list(itertools.chain.from_iterable(wire_descriptions))
+    n_lines = len(all_line_segments)
+
+    for i in range(n_lines):
+        for j in range(n_lines):
+            if i != j:
+                x = get_intersection(all_line_segments[i], all_line_segments[j])
+                if x is not None:
+                    intersections.append(x)
+
+    dist_from_zero = [abs(point[0]) + abs(point[1]) for point in intersections]
+    dist_from_zero.sort()
+
+    # Get the minimum value
+    print(f"The minimum Manhattan distance to an intersection from (0,0) is {dist_from_zero[0]}")
+
+    # Got 36 but it isn't right, so need to go back to the start
+
 
 
 
